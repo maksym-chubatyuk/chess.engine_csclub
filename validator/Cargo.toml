@@ -3,4 +3,9 @@ name = "validator"
 version = "0.1.0"
 edition = "2024"
 
+[lib]
+name = "validator"
+target = ["cdylib"]
+
 [dependencies]
+pyo3 = "0.30.1"

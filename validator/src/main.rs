@@ -1,7 +1,6 @@
 // Very annoying for a work in progress
 #![allow(dead_code)]
-pub mod game;
-use game::*;
+use validator::game::*;
 
 fn main() {
     let state = GameState::new();
