@@ -5,7 +5,7 @@ edition = "2024"
 
 [lib]
 name = "validator"
-target = ["cdylib"]
+crate-type = ["cdylib"]
 
 [dependencies]
 pyo3 = "0.30.1"
