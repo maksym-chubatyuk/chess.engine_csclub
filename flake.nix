@@ -32,6 +32,8 @@
         buildInputs = with pkgs; [
           python314
           python314Packages.python-lsp-server
+          python314Packages.numpy
+          python314Packages.pytest
           pyright
 
           rustToolchain
@@ -48,8 +50,6 @@
           source .venv/bin/activate
           # This causes bad wheel naming when cross compiling from linux to mac for some reason
           unset _PYTHON_HOST_PLATFORM
-          # Some requirements not in nixpkgs so better to just install here
-          pip install -r requirements.txt --quiet
         '';
       };
     };
