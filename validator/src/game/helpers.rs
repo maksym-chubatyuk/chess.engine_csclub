@@ -1,4 +1,4 @@
-use std::fmt;
+use std::{fmt, slice::SliceIndex};
 
 // Useful masks to stop pieces from wrapping around the board when doing binary magic
 pub const NOT_A_FILE: u64 = 0xFEFEFEFEFEFEFEFE;
@@ -7,18 +7,21 @@ pub const NOT_FIRST_RANK: u64 = 0xFFFFFFFFFFFFFF00;
 pub const NOT_LAST_RANK: u64 = 0x00FFFFFFFFFFFFFF;
 
 #[derive(Clone, Copy)]
+#[repr(usize)]
 pub enum Color {
-    White,
-    Black,
+    White = 0,
+    Black = 1,
 }
 
+#[derive(Clone, Copy)]
+#[repr(usize)]
 pub enum Piece {
-    Pawn,
-    Rook,
-    Knight,
-    Bishop,
-    Queen,
-    King,
+    Pawn = 0,
+    Knight = 1,
+    Bishop = 2,
+    Rook = 3,
+    Queen = 4,
+    King = 5,
 }
 
 #[derive(Clone, Copy)]
