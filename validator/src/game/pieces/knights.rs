@@ -1,4 +1,4 @@
-use super::helpers::*;
+use super::*;
 
 // TODO: Could just shift a mask by index, maybe more efficient?
 pub fn get_knight_moves_from(from: u64, team_pieces: u64) -> Result<u64, ForbiddenMoveError> {

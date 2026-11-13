@@ -1,4 +1,4 @@
-use super::helpers::*;
+use super::*;
 
 pub fn get_bishop_moves_from(
     from: u64,

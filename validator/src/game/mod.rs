@@ -1,5 +1,7 @@
 mod helpers;
-mod pieces;
+// pub for debugging from main.rs,
+// this should probably be private later
+pub mod pieces;
 
 pub use helpers::*;
 use std::fmt;
