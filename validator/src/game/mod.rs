@@ -4,7 +4,6 @@ mod pieces;
 pub use helpers::*;
 use std::fmt;
 
-// TODO Use enum indexed list rather than individual variables
 pub struct GameState {
     pub pieces: [[u64; 6]; 2],
     pub player_turn: Color,
@@ -41,6 +40,14 @@ impl GameState {
             castling_rights: CastlingRights::ANY,
             moves_without_capture: 0,
         }
+    }
+
+    pub fn get_piece(&self, color: Color, piece: Piece) -> u64 {
+        self.pieces[color as usize][piece as usize]
+    }
+
+    pub fn get_piece_mut(&mut self, color: Color, piece: Piece) -> &mut u64 {
+        &mut self.pieces[color as usize][piece as usize]
     }
 
     pub fn get_pieces(&self, color: Color) -> u64 {
