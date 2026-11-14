@@ -1,7 +1,8 @@
 #![allow(unused)]
 use pyo3::prelude::*;
 
-pub mod game;
+mod game;
+pub mod prelude;
 
 #[pymodule]
 mod validator {
