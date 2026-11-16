@@ -7,5 +7,10 @@ edition = "2024"
 name = "validator"
 crate-type = ["lib", "cdylib"]
 
+[profile.release]
+strip = true
+codegen-units = 1
+lto = "fat"
+
 [dependencies]
 pyo3 = "0.30.1"
