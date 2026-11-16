@@ -25,9 +25,9 @@ mod validator {
         }
 
         /// Returns the a list of all legal moves in
-        /// algebraic notation
+        /// UCI notation
         fn get_legal_moves(&self) -> Vec<String> {
-            unimplemented!("Work on this")
+            self.internal_state.get_all_moves()
         }
     }
 }

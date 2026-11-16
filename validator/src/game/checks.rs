@@ -2,16 +2,9 @@ use super::pieces::get_piece_threats_from;
 use super::*;
 
 pub fn is_king_in_check(state: &GameState, color: Color) -> Result<bool, ForbiddenMoveError> {
-    let all_pieces = [
-        Piece::Pawn,
-        Piece::Knight,
-        Piece::Bishop,
-        Piece::Rook,
-        Piece::Queen,
-        Piece::King,
-    ];
+    const ALL_PIECES: [Piece; 6] = Piece::list();
     let king = state.get_piece(color, Piece::King);
-    for piece in all_pieces {
+    for piece in ALL_PIECES {
         let (piece_value, other_color) = match color {
             Color::White => (state.get_piece(Color::Black, piece), Color::Black),
             Color::Black => (state.get_piece(Color::White, piece), Color::White),
@@ -31,18 +24,4 @@ pub fn is_king_in_check(state: &GameState, color: Color) -> Result<bool, Forbidd
         }
     }
     Ok(false)
-}
-
-/// Returns an iterator of u64s that correspond to each set bit
-/// of the argument u64
-fn set_bits(mut bits: u64) -> impl Iterator<Item = u64> {
-    std::iter::from_fn(move || {
-        if bits == 0 {
-            return None;
-        }
-
-        let bit = bits & bits.wrapping_neg();
-        bits &= bits - 1;
-        Some(bit)
-    })
 }

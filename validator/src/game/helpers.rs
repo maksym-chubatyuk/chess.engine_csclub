@@ -24,6 +24,19 @@ pub enum Piece {
     King = 5,
 }
 
+impl Piece {
+    pub const fn list() -> [Piece; 6] {
+        [
+            Self::Pawn,
+            Self::Knight,
+            Self::Bishop,
+            Self::Rook,
+            Self::Queen,
+            Self::King,
+        ]
+    }
+}
+
 #[derive(Clone, Copy)]
 pub struct CastlingRights(pub u8);
 
@@ -96,4 +109,24 @@ pub fn square_to_mask(square: &str) -> Option<u64> {
     let bit_index = rank_idx * 8 + file_idx;
 
     Some(1u64 << bit_index)
+}
+
+pub fn move_to_string(state: &super::GameState, piece: Piece, color: Color) -> String {
+    let mut result = String::new();
+    unimplemented!("finish this");
+    result
+}
+
+/// Returns an iterator of u64s that correspond to each set bit
+/// of the argument u64
+pub fn set_bits(mut bits: u64) -> impl Iterator<Item = u64> {
+    std::iter::from_fn(move || {
+        if bits == 0 {
+            return None;
+        }
+
+        let bit = bits & bits.wrapping_neg();
+        bits &= bits - 1;
+        Some(bit)
+    })
 }
