@@ -3,7 +3,7 @@ use super::*;
 // TODO: Promotion
 pub fn get_pawn_moves_from(
     from: u64,
-    color: Option<Color>,
+    color: Color,
     team_pieces: u64,
     enemy_pieces: u64,
 ) -> Result<u64, ForbiddenMoveError> {
@@ -11,8 +11,6 @@ pub fn get_pawn_moves_from(
         return Err(ForbiddenMoveError("Pawn"));
     }
     let empty_squares = !(enemy_pieces | team_pieces);
-
-    let color = color.ok_or_else(|| ForbiddenMoveError("Need to provide color for pawn moves"))?;
 
     let mut result = 0u64;
     // Pawns are weird because only one direction so we need diff logic for white and black

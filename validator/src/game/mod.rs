@@ -1,3 +1,4 @@
+mod checks;
 mod helpers;
 // pub for debugging from main.rs,
 // this should probably be private later
@@ -7,12 +8,12 @@ pub use helpers::*;
 use std::fmt;
 
 pub struct GameState {
-    pub pieces: [[u64; 6]; 2],
-    pub player_turn: Color,
-    pub castling_rights: CastlingRights,
+    pieces: [[u64; 6]; 2],
+    player_turn: Color,
+    castling_rights: CastlingRights,
 
     //NOTE: The 50 "move" rule counts a move as *both* sides moving
-    pub moves_without_capture: usize,
+    moves_without_capture: usize,
 }
 
 impl GameState {
@@ -52,14 +53,14 @@ impl GameState {
         &mut self.pieces[color as usize][piece as usize]
     }
 
-    pub fn get_pieces(&self, color: Color) -> u64 {
+    pub fn get_color_pieces(&self, color: Color) -> u64 {
         self.pieces[color as usize]
             .iter()
             .fold(0u64, |acc, piece| acc | piece)
     }
 
     pub fn get_occupied_squares(&self) -> u64 {
-        self.get_pieces(Color::White) | self.get_pieces(Color::Black)
+        self.get_color_pieces(Color::White) | self.get_color_pieces(Color::Black)
     }
 
     pub fn move_piece(&mut self, piece: Piece, color: Color, from: u64, to: u64) {
