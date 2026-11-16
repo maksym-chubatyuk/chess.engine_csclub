@@ -1,6 +1,5 @@
 use super::*;
 
-//TODO: This is broken around the edges
 pub fn get_rook_moves_from(
     from: u64,
     team_pieces: u64,
@@ -15,10 +14,10 @@ pub fn get_rook_moves_from(
 
     // Right
     loop {
-        pointer <<= 1;
         if pointer & NOT_H_FILE == 0 {
             break;
         }
+        pointer <<= 1;
         if pointer & enemy_pieces != 0 {
             result |= pointer;
             break;
@@ -31,10 +30,10 @@ pub fn get_rook_moves_from(
     // Left
     pointer = from;
     loop {
-        pointer >>= 1;
         if pointer & NOT_A_FILE == 0 {
             break;
         }
+        pointer >>= 1;
         if pointer & enemy_pieces != 0 {
             result |= pointer;
             break;
@@ -48,7 +47,7 @@ pub fn get_rook_moves_from(
     pointer = from;
     loop {
         pointer <<= 8;
-        if pointer & NOT_FIRST_RANK == 0 {
+        if pointer == 0 {
             break;
         }
         if pointer & enemy_pieces != 0 {
@@ -64,7 +63,7 @@ pub fn get_rook_moves_from(
     pointer = from;
     loop {
         pointer >>= 8;
-        if pointer & NOT_LAST_RANK == 0 {
+        if pointer == 0 {
             break;
         }
         if pointer & enemy_pieces != 0 {
