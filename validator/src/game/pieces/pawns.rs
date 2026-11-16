@@ -28,11 +28,18 @@ pub fn get_pawn_moves_from(
             result |= ((result & SIXTH_RANK_MASK) >> 8) & empty_squares;
         }
     };
-    result |= get_pawn_threats_from(from, color) & enemy_pieces;
     Ok(result)
 }
 
-fn get_pawn_threats_from(pawn: u64, color: Color) -> u64 {
+pub fn get_pawn_threats_from(
+    pawn: u64,
+    color: Color,
+    team_pieces: u64,
+) -> Result<u64, ForbiddenMoveError> {
+    if pawn.count_ones() != 1 {
+        return Err(ForbiddenMoveError("Pawn"));
+    }
+
     let mut result = 0u64;
     // TODO: En passant
     match color {
@@ -47,5 +54,5 @@ fn get_pawn_threats_from(pawn: u64, color: Color) -> u64 {
             result |= attack_left | attack_right;
         }
     };
-    result
+    Ok(result & !team_pieces)
 }
