@@ -70,8 +70,7 @@ impl GameState {
 
     pub fn is_valid(&self) -> bool {
         // TODO : more checks necessary, probably?
-        !is_king_in_check(self, Color::White).unwrap()
-            && !is_king_in_check(self, Color::Black).unwrap()
+        !is_king_in_check(self, self.player_turn).unwrap_or(true)
     }
 
     pub fn get_all_moves(&self) -> Vec<String> {
