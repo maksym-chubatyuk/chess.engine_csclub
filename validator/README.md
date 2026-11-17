@@ -5,7 +5,7 @@ This library has been written in Rust for efficient bitboard representation.
 First, install the library:
 
 ```bash
-pip install --no-index --find-links=./validator/wheels validator
+pip install --upgrade --no-index --find-links=./validator/wheels validator
 ```
 
 Then, to use
