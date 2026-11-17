@@ -111,12 +111,6 @@ pub fn square_to_mask(square: &str) -> Option<u64> {
     Some(1u64 << bit_index)
 }
 
-pub fn move_to_string(state: &super::GameState, piece: Piece, color: Color) -> String {
-    let mut result = String::new();
-    unimplemented!("finish this");
-    result
-}
-
 /// Returns an iterator of u64s that correspond to each set bit
 /// of the argument u64
 pub fn set_bits(mut bits: u64) -> impl Iterator<Item = u64> {
