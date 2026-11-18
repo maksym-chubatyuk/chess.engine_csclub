@@ -29,5 +29,14 @@ mod validator {
         fn get_legal_moves(&self) -> Vec<String> {
             self.internal_state.get_all_moves()
         }
+
+        /// Attempts to make a move. Returns whether the move was successful.
+        fn move_piece(&mut self, movement: String) -> bool {
+            self.internal_state.move_piece(movement).is_ok()
+        }
+
+        fn print(&self) {
+            println!("{}", self.internal_state);
+        }
     }
 }

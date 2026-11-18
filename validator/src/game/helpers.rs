@@ -13,6 +13,15 @@ pub enum Color {
     Black = 1,
 }
 
+impl Color {
+    pub fn invert(&self) -> Self {
+        match self {
+            Color::White => Color::Black,
+            Color::Black => Color::White,
+        }
+    }
+}
+
 #[derive(Clone, Copy)]
 #[repr(usize)]
 pub enum Piece {

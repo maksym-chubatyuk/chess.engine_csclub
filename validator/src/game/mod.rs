@@ -150,8 +150,36 @@ impl GameState {
         self.get_color_pieces(Color::White) | self.get_color_pieces(Color::Black)
     }
 
-    pub fn move_piece(&mut self, piece: Piece, color: Color, from: u64, to: u64) {
-        unimplemented!("Only move creation for now");
+    /// Attempt to make a from a UCI formatted move
+    pub fn move_piece(&mut self, movement: String) -> Result<(), ForbiddenMoveError> {
+        if movement.len() != 4 {
+            return Err(ForbiddenMoveError("Invalid format"));
+        }
+        let (from_str, to_str) = movement.split_at(2);
+        let from = square_to_mask(from_str).ok_or(ForbiddenMoveError("invalid starting format"))?;
+        let to = square_to_mask(to_str).ok_or(ForbiddenMoveError("invalid destination format"))?;
+
+        // TODO : Maybe cache this
+        let moves = self.get_all_moves();
+
+        if !moves.contains(&format!("{from_str}{to_str}")) {
+            return Err(ForbiddenMoveError("not a legal move"));
+        }
+        let (color, piece) = match self.get_piece_on(from) {
+            Some((color, piece)) => (color, piece),
+            None => return Err(ForbiddenMoveError("no piece on starting square")),
+        };
+        if let Some((captured_color, captured_piece)) = self.get_piece_on(to) {
+            if std::mem::discriminant(&color) == std::mem::discriminant(&captured_color) {
+                return Err(ForbiddenMoveError("tried to capture own piece"));
+            }
+            *self.get_piece_mut(captured_color, captured_piece) &= !to;
+        }
+
+        *self.get_piece_mut(color, piece) &= !from;
+        *self.get_piece_mut(color, piece) |= to;
+        self.player_turn = self.player_turn.invert();
+        Ok(())
     }
 }
 

@@ -8,12 +8,29 @@ First, install the library:
 pip install --upgrade --no-index --find-links=./validator/wheels validator
 ```
 
-Then, to use
+Then, to use:
 ```python
   from validator import State
   state = State() # Creates a new chess game at default position
   moves = state.get_legal_moves()
+  status = state.move_piece("e2e4") # Pushes e2 pawn forward two squares, returns whether it was successful
+  state.print()
 ```
 
-Currently, the library does not support moving pieces and thus only gives the
-legal moves from the starting position.
+Output:
+
+```text
+  +-----------------+
+8 | r n b q k b n r |
+7 | p p p p p p p p |
+6 | • • • • • • • • |
+5 | • • • • • • • • |
+4 | • • • • P • • • |
+3 | • • • • • • • • |
+2 | P P P P • P P P |
+1 | R N B Q K B N R |
+  +-----------------+
+    a b c d e f g h
+Turn: Black
+```
+
