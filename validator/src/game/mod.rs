@@ -73,6 +73,50 @@ impl GameState {
         !is_king_in_check(self, self.player_turn).unwrap_or(true)
     }
 
+    fn apply_move_unchecked(&mut self, from: u64, to: u64) {
+        let Some((color, piece)) = self.get_piece_on(from) else {
+            return;
+        };
+
+        // Handle en passant capture
+        if matches!(piece, Piece::Pawn) {
+            if let Some(ep_square) = self.en_passant_square {
+                let ep_mask = 1u64 << ep_square;
+                if to == ep_mask {
+                    let captured_pawn_mask = match color {
+                        Color::White => ep_mask >> 8,
+                        Color::Black => ep_mask << 8,
+                    };
+
+                    *self.get_piece_mut(color.invert(), Piece::Pawn) &= !captured_pawn_mask;
+                }
+            }
+        }
+
+        // Handle normal capture
+        if let Some((captured_color, captured_piece)) = self.get_piece_on(to) {
+            *self.get_piece_mut(captured_color, captured_piece) &= !to;
+        }
+
+        // Update en-passant square
+        self.en_passant_square = None;
+        if matches!(piece, Piece::Pawn) {
+            match color {
+                Color::White if to == from << 16 => {
+                    self.en_passant_square = Some((from << 8).trailing_zeros() as u8);
+                }
+                Color::Black if to == from >> 16 => {
+                    self.en_passant_square = Some((from >> 8).trailing_zeros() as u8);
+                }
+                _ => {}
+            }
+        }
+
+        *self.get_piece_mut(color, piece) &= !from;
+        *self.get_piece_mut(color, piece) |= to;
+        self.player_turn = self.player_turn.invert();
+    }
+
     pub fn get_all_moves(&self) -> Vec<String> {
         let mut result = Vec::new();
 
@@ -123,20 +167,7 @@ impl GameState {
                 //NOTE: This is "copy-make" and not "make-unmake", maybe consider hybrid approach??
                 let mut next_state = self.clone();
 
-                *next_state.get_piece_mut(color, piece) &= !from_mask;
-
-                // Remove any captured piece
-                // NOTE: This doesn't remove ep captures, might be worth it to do that? would allow
-                // some logic deduplication
-                if let Some((captured_color, captured_piece)) = next_state.get_piece_on(target_mask)
-                {
-                    assert!(
-                        std::mem::discriminant(&color) != std::mem::discriminant(&captured_color)
-                    );
-                    *next_state.get_piece_mut(captured_color, captured_piece) &= !target_mask;
-                }
-
-                *next_state.get_piece_mut(color, piece) |= target_mask;
+                next_state.apply_move_unchecked(from_mask, target_mask);
 
                 if !next_state.is_valid() {
                     continue;
@@ -166,61 +197,17 @@ impl GameState {
         if movement.len() != 4 {
             return Err(ForbiddenMoveError("Invalid format"));
         }
+
         let (from_str, to_str) = movement.split_at(2);
         let from = square_to_mask(from_str).ok_or(ForbiddenMoveError("invalid starting format"))?;
         let to = square_to_mask(to_str).ok_or(ForbiddenMoveError("invalid destination format"))?;
 
-        // TODO : Maybe cache this
         let moves = self.get_all_moves();
-
         if !moves.contains(&format!("{from_str}{to_str}")) {
             return Err(ForbiddenMoveError("not a legal move"));
         }
-        let (color, piece) = match self.get_piece_on(from) {
-            Some((color, piece)) => (color, piece),
-            None => return Err(ForbiddenMoveError("no piece on starting square")),
-        };
 
-        // Handle en passant capture
-        if matches!(piece, Piece::Pawn) {
-            if let Some(ep_sq) = self.en_passant_square {
-                let ep_mask = 1u64 << ep_sq;
-                if to == ep_mask {
-                    let captured_pawn_mask = match color {
-                        Color::White => ep_mask >> 8,
-                        Color::Black => ep_mask << 8,
-                    };
-                    *self.get_piece_mut(color.invert(), Piece::Pawn) &= !captured_pawn_mask;
-                }
-            }
-        }
-
-        // Set new en passant square
-        self.en_passant_square = None;
-        if matches!(piece, Piece::Pawn) {
-            match color {
-                Color::White if to == from << 16 => {
-                    self.en_passant_square = Some((from << 8).trailing_zeros() as u8);
-                }
-                Color::Black if to == from >> 16 => {
-                    self.en_passant_square = Some((from >> 8).trailing_zeros() as u8);
-                }
-                _ => {}
-            };
-        }
-
-        // Handle standard captures
-        if let Some((captured_color, captured_piece)) = self.get_piece_on(to) {
-            if std::mem::discriminant(&color) == std::mem::discriminant(&captured_color) {
-                return Err(ForbiddenMoveError("tried to capture own piece"));
-            }
-            *self.get_piece_mut(captured_color, captured_piece) &= !to;
-        }
-
-        // Move the piece and switch turns
-        *self.get_piece_mut(color, piece) &= !from;
-        *self.get_piece_mut(color, piece) |= to;
-        self.player_turn = self.player_turn.invert();
+        self.apply_move_unchecked(from, to);
         Ok(())
     }
 }
