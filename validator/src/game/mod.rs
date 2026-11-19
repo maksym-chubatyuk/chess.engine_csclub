@@ -70,7 +70,10 @@ impl GameState {
 
     pub fn is_valid(&self) -> bool {
         // TODO : more checks necessary, probably?
-        !is_king_in_check(self, self.player_turn).unwrap_or(true)
+        // We need to invert the color because after the move is made, the color is inverted automatically
+        // so it would fail if the player put the other in check but be fine if they put themselves
+        // in check
+        !is_king_in_check(self, self.player_turn.invert()).unwrap_or(true)
     }
 
     fn apply_move_unchecked(&mut self, from: u64, to: u64) {
