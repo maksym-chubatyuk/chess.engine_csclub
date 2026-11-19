@@ -1,0 +1,9 @@
+from typing import final
+
+@final
+class State:
+    def __new__(cls, /) -> State: ...
+    def get_legal_moves(self, /) -> list[str]:
+    def move_piece(self, /, movement: str) -> bool:
+    def print(self, /) -> None: ...
+    def status(self, /) -> str: ...
