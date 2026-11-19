@@ -41,7 +41,6 @@ pub fn get_pawn_threats_from(
     }
 
     let mut result = 0u64;
-    // TODO: En passant
     match color {
         Color::White => {
             let attack_left = (pawn << 7) & NOT_H_FILE;

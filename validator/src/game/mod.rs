@@ -14,8 +14,8 @@ pub struct GameState {
     player_turn: Color,
     castling_rights: CastlingRights,
 
-    //NOTE: The 50 "move" rule counts a move as *both* sides moving
-    moves_without_capture: u8,
+    // TODO: Threefold repetition
+    halfmove_clock: u8,
     en_passant_square: Option<u8>,
 }
 
@@ -44,7 +44,7 @@ impl GameState {
             ],
             player_turn: Color::White,
             castling_rights: CastlingRights::ANY,
-            moves_without_capture: 0,
+            halfmove_clock: 0,
             en_passant_square: None,
         }
     }
@@ -78,8 +78,11 @@ impl GameState {
             return;
         };
 
+        self.halfmove_clock += 1;
+
         // Handle en passant capture
         if matches!(piece, Piece::Pawn) {
+            self.halfmove_clock = 0; // Also resets when a pawn is moved
             if let Some(ep_square) = self.en_passant_square {
                 let ep_mask = 1u64 << ep_square;
                 if to == ep_mask {
@@ -95,6 +98,7 @@ impl GameState {
 
         // Handle normal capture
         if let Some((captured_color, captured_piece)) = self.get_piece_on(to) {
+            self.halfmove_clock = 0;
             *self.get_piece_mut(captured_color, captured_piece) &= !to;
         }
 
@@ -110,6 +114,17 @@ impl GameState {
                 }
                 _ => {}
             }
+        }
+
+        // Revoke castling rights
+        match from {
+            0x1 => self.castling_rights.revoke(CastlingRights::WHITE_QUEENSIDE),
+            0x80 => self.castling_rights.revoke(CastlingRights::WHITE_KINGSIDE),
+            0x10 => self.castling_rights.revoke(CastlingRights::ANY_WHITE),
+            0x100000000000000 => self.castling_rights.revoke(CastlingRights::BLACK_QUEENSIDE),
+            0x8000000000000000 => self.castling_rights.revoke(CastlingRights::BLACK_KINGSIDE),
+            0x1000000000000000 => self.castling_rights.revoke(CastlingRights::ANY_BLACK),
+            _ => {}
         }
 
         *self.get_piece_mut(color, piece) &= !from;
@@ -177,8 +192,15 @@ impl GameState {
                 move_text.push_str(&mask_to_square(target_mask).unwrap_or_default());
                 result.push(move_text);
             }
+            if self.halfmove_clock >= 100 {
+                result.push(String::from("draw"))
+            }
         }
 
+        if result == vec![String::from("draw")] {
+            // Checkmate takes precedence
+            return vec![];
+        }
         result
     }
 
