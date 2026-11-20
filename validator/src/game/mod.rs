@@ -76,6 +76,17 @@ impl GameState {
         !is_king_in_check(self, self.player_turn.invert()).unwrap_or(true)
     }
 
+    pub fn status(&self) -> GameStatus {
+        let check = is_king_in_check(self, self.player_turn).unwrap_or(true);
+        let can_move = self.get_all_moves().len() != 0;
+        match (check, can_move) {
+            (false, true) => GameStatus::Normal,
+            (true, true) => GameStatus::Check,
+            (false, false) => GameStatus::Stalemate,
+            (true, false) => GameStatus::Checkmate,
+        }
+    }
+
     fn apply_move_unchecked(&mut self, from: u64, to: u64) {
         let Some((color, piece)) = self.get_piece_on(from) else {
             return;
@@ -291,6 +302,7 @@ impl fmt::Display for GameState {
             Color::White => "White",
             Color::Black => "Black",
         };
-        write!(f, "Turn: {}", turn)
+        writeln!(f, "Turn: {}", turn);
+        write!(f, "Status: {}", self.status())
     }
 }

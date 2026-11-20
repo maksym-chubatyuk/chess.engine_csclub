@@ -7,8 +7,8 @@ pub mod prelude;
 #[pymodule]
 mod validator {
 
+    use super::prelude::*;
     use super::*;
-    use game::GameState;
 
     #[pyclass]
     struct State {
@@ -33,6 +33,15 @@ mod validator {
         /// Attempts to make a move. Returns whether the move was successful.
         fn move_piece(&mut self, movement: String) -> bool {
             self.internal_state.move_piece(movement).is_ok()
+        }
+
+        fn status(&self) -> &str {
+            match self.internal_state.status() {
+                GameStatus::Normal => "normal",
+                GameStatus::Check => "check",
+                GameStatus::Stalemate => "stalemate",
+                GameStatus::Checkmate => "checkmate",
+            }
         }
 
         fn print(&self) {

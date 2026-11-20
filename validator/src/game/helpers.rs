@@ -46,6 +46,24 @@ impl Piece {
     }
 }
 
+pub enum GameStatus {
+    Normal,
+    Check,
+    Checkmate,
+    Stalemate,
+}
+
+impl std::fmt::Display for GameStatus {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            GameStatus::Normal => write!(f, "In progress"),
+            GameStatus::Check => write!(f, "In check"),
+            GameStatus::Checkmate => write!(f, "Checkmate"),
+            GameStatus::Stalemate => write!(f, "Stalemate"),
+        }
+    }
+}
+
 #[derive(Clone, Copy)]
 pub struct CastlingRights(pub u8);
 
