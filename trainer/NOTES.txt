@@ -1,0 +1,28 @@
+Trainer notes
+
+- C++ with LibTorch. CUDA only, trained on the RTX 5080.
+- Pure BF16: weights, grads, optimizer state. AdamW with Kahan summation.
+- LR: warmup, then cosine decay. No weight decay on norms, pos, attn_bias.
+- The network must match engine/model/scorer.py exactly: sizes, layer order,
+  RMSNorm eps 1e-6, tensor names and shapes.
+- Output: one safetensors file, BF16, names = ValueNet state_dict keys.
+- Input: same as engine/encoding.py. 18 planes -> 64 tokens x 18,
+  token index = square = rank * 8 + file, board mirrored when Black to move.
+- The C++ encoder must match encoding.py exactly. Add a parity test.
+- Target: score from the side to move. Labels are White-based (1 = good for
+  White), so use 1 - label when Black is to move.
+- Loss: cross-entropy over 128 bins on [0, 1], HL-Gauss targets
+  (sigma ~0.75 bin width).
+- Skip finished positions (mate, stalemate). The engine handles those.
+- Encode positions once into binary shards, train from those.
+
+Stage 1: supervised
+- Stockfish-labeled positions: the existing dataset, plus our own Stockfish
+  runs on more games at fixed depth/nodes so labels stay consistent.
+
+Stage 2: self-play RL
+- Engine plays itself, picking moves by scoring child positions, with some
+  randomness to explore.
+- Labels from game results: 1 / 0.5 / 0 (White-based, same flip as above).
+- Needs a fast C++ move generator (own, or the Rust validator via C ABI).
+- Mix in stage 1 data. Keep a new checkpoint only if it beats the previous one.
