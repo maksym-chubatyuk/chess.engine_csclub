@@ -34,6 +34,8 @@
           python314Packages.python-lsp-server
           python314Packages.numpy
           python314Packages.pytest
+          python314Packages.torch
+          python314Packages.safetensors
           pyright
 
           rustToolchain
